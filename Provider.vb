@@ -16,7 +16,7 @@
         Me.ScanDirectory(New IO.DirectoryInfo(Path), Me.Root)
     End Sub
     Public Sub AddDirectory(Path As String, base As Entity)
-        If (base IsNot Nothing) Then
+        If (base IsNot Nothing AndAlso base.Type = EntityType.Root Or base.Type = EntityType.Directory) Then
             Me.ScanDirectory(New IO.DirectoryInfo(Path), base)
         End If
     End Sub
@@ -30,10 +30,7 @@
     End Sub
     Public Sub AddFile(Filename As String, base As Entity)
         If (IO.File.Exists(Filename) AndAlso base IsNot Nothing) Then
-            If (Me.Root Is Nothing) Then
-                Me.Root = New Root("root")
-            End If
-            If (base.Type = EntityType.Root Or base.Type = EntityType.Directory) Then
+            If (base Is Nothing AndAlso base.Type = EntityType.Root Or base.Type = EntityType.Directory) Then
                 Me.CreateEntity(Filename, EntityType.File, base)
             Else
                 Throw New Exception(String.Format("Current entity '{0}' does not accept sub items", base.Type))
