@@ -68,7 +68,6 @@
   <ItemGroup>
     <Compile Include="BackgroundWorker.vb" />
     <Compile Include="Constants.vb" />
-    <Compile Include="Delayed.vb" />
     <Compile Include="Directory.vb" />
     <Compile Include="Extensions.vb" />
     <Compile Include="File.vb" />
