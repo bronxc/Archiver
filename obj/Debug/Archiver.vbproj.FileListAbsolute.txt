@@ -1,0 +1,15 @@
+C:\Users\Barret\AppData\Local\Temporary Projects\Archiver\bin\Debug\Archiver.dll
+C:\Users\Barret\AppData\Local\Temporary Projects\Archiver\bin\Debug\Archiver.pdb
+C:\Users\Barret\AppData\Local\Temporary Projects\Archiver\obj\Debug\Archiver.Resources.resources
+C:\Users\Barret\AppData\Local\Temporary Projects\Archiver\obj\Debug\Archiver.vbproj.GenerateResource.Cache
+C:\Users\Barret\AppData\Local\Temporary Projects\Archiver\obj\Debug\Archiver.dll
+C:\Users\Barret\AppData\Local\Temporary Projects\Archiver\obj\Debug\Archiver.pdb
+C:\Users\Barret\Documents\GitHub\Archiver\bin\Debug\Archiver.dll
+C:\Users\Barret\Documents\GitHub\Archiver\bin\Debug\Archiver.pdb
+C:\Users\Barret\Documents\GitHub\Archiver\bin\Debug\Header.dll
+C:\Users\Barret\Documents\GitHub\Archiver\bin\Debug\Header.pdb
+C:\Users\Barret\Documents\GitHub\Archiver\obj\Debug\Archiver.vbprojResolveAssemblyReference.cache
+C:\Users\Barret\Documents\GitHub\Archiver\obj\Debug\Archiver.Resources.resources
+C:\Users\Barret\Documents\GitHub\Archiver\obj\Debug\Archiver.vbproj.GenerateResource.Cache
+C:\Users\Barret\Documents\GitHub\Archiver\obj\Debug\Archiver.dll
+C:\Users\Barret\Documents\GitHub\Archiver\obj\Debug\Archiver.pdb
