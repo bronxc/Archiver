@@ -4,12 +4,11 @@ Public Class FrmMain
     Private Sub FrmMain_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Me.Provider = New Provider
         Me.Details.Columns.Add("Name", Me.Details.ClientRectangle.Width \ 3, HorizontalAlignment.Left)
-        Me.Details.Columns.Add("Created", Me.Details.ClientRectangle.Width \ 3, HorizontalAlignment.Left)
         Me.Details.Columns.Add("Type", Me.Details.ClientRectangle.Width \ 3, HorizontalAlignment.Left)
+        Me.Details.Columns.Add("Details", Me.Details.ClientRectangle.Width \ 3, HorizontalAlignment.Left)
     End Sub
     Private Sub btnNew_Click(sender As Object, e As EventArgs) Handles btnNew.Click
-        Me.Provider.Create("root")
-        Me.SetTitle(Me.Provider.Root.GetSignature)
+        Me.Provider.Create("Entrypoint")
         Me.TreeviewUpdate(Me.ArchiveTree, Me.Provider, True)
     End Sub
     Private Sub btnAddFile_Click(sender As Object, e As EventArgs) Handles btnAddFile.Click
@@ -48,7 +47,6 @@ Public Class FrmMain
                 BackgroundWorker.Run(Sub()
                                          Me.ButtonsEnabled(False)
                                          Me.Provider.Open(ofd.FileName)
-                                         Me.SetTitle(Me.Provider.Root.GetSignature)
                                          Me.TreeviewUpdate(Me.ArchiveTree, Me.Provider, True)
                                          Me.ButtonsEnabled(True)
                                      End Sub)
@@ -69,13 +67,13 @@ Public Class FrmMain
         End Using
     End Sub
     Private Sub btnExtracAll_Click(sender As Object, e As EventArgs) Handles btnExtracAll.Click
-        If (Me.Provider IsNot Nothing AndAlso Me.Provider.Root IsNot Nothing) Then
+        If (Me.Provider IsNot Nothing AndAlso Me.Provider.Entrypoint IsNot Nothing) Then
             Using ofb As New FolderBrowserDialog With {.Description = "Select folder",
                                                        .SelectedPath = Application.StartupPath}
                 If (ofb.ShowDialog(Me) = Windows.Forms.DialogResult.OK) Then
                     BackgroundWorker.Run(Sub()
                                              Me.ButtonsEnabled(False)
-                                             Me.Provider.Extract(ofb.SelectedPath, Me.Provider.Root)
+                                             Me.Provider.Extract(ofb.SelectedPath, Me.Provider.Entrypoint)
                                              Me.ButtonsEnabled(True)
                                          End Sub)
                 End If
@@ -93,37 +91,30 @@ Public Class FrmMain
     End Sub
     Private Sub ArchiveTree_AfterSelect(sender As Object, e As TreeViewEventArgs) Handles ArchiveTree.AfterSelect
         Dim result As New List(Of Archiver.Entities.Entity)
-        If (Me.Provider.Root.FindByGuid(e.Node.Tag.ToString, result)) Then
+        If (Me.Provider.Entrypoint.FindByGuid(e.Node.Tag.ToString, result)) Then
             Me.Details.Items.Clear()
             Me.UpdateDetails(result.First)
         Else
             Me.Details.Items.Clear()
         End If
     End Sub
-    Private Sub SetTitle(Title As String)
-        If (Me.InvokeRequired) Then
-            Me.Invoke(Sub() Me.SetTitle(Title))
-        Else
-            Me.Text = String.Format("Archiver [{0}]", Title)
-        End If
-    End Sub
     Private Sub UpdateDetails(selected As Archiver.Entities.Entity)
 
         Dim lvitem As ListViewItem = Me.Details.Items.Add(selected.Name)
-        lvitem.SubItems.Add(selected.Created.ToString)
         lvitem.SubItems.Add(selected.Type.ToString)
+        lvitem.SubItems.Add(selected.ToString)
 
-        If (selected.Type = EntityType.Root) Then
-            For Each e As Archiver.Entities.Entity In CType(selected, Archiver.Entities.Root).Content
-                lvitem = Me.Details.Items.Add(String.Format("..\{0}", e.Name))
-                lvitem.SubItems.Add(e.Created.ToString)
+        If (selected.Type = EntityType.Entrypoint) Then
+            For Each e As Archiver.Entities.Entity In CType(selected, Archiver.Entities.Entrypoint).Content
+                lvitem = Me.Details.Items.Add(String.Format("- {0}", e.Name))
                 lvitem.SubItems.Add(e.Type.ToString)
+                lvitem.SubItems.Add(e.ToString)
             Next
         ElseIf (selected.Type = EntityType.Directory) Then
             For Each e As Archiver.Entities.Entity In CType(selected, Archiver.Entities.Directory).Content
-                lvitem = Me.Details.Items.Add(String.Format("..\{0}", e.Name))
-                lvitem.SubItems.Add(e.Created.ToString)
+                lvitem = Me.Details.Items.Add(String.Format("- {0}", e.Name))
                 lvitem.SubItems.Add(e.Type.ToString)
+                lvitem.SubItems.Add(e.ToString)
             Next
         End If
     End Sub
@@ -145,15 +136,18 @@ Public Class FrmMain
         If (ctrl.InvokeRequired) Then
             ctrl.Invoke(Sub() Me.TreeviewUpdate(ctrl, provider, clear))
         Else
-            If (provider IsNot Nothing AndAlso provider.Root IsNot Nothing) Then
+            If (provider IsNot Nothing AndAlso provider.Entrypoint IsNot Nothing) Then
                 With ctrl
                     If (clear) Then
                         .Nodes.Clear()
                         Me.Details.Items.Clear()
                     End If
                     .BeginUpdate()
-                    .Nodes.Add(Me.TreeviewCreateNodes(provider.Root))
-                    .ExpandAll()
+                    .Nodes.Add(Me.TreeviewCreateNodes(provider.Entrypoint))
+                    If (.Nodes.Count > 0) Then
+                        .Nodes(0).Expand()
+                        .SelectedNode = .Nodes(0)
+                    End If
                     .EndUpdate()
                 End With
             End If
@@ -163,8 +157,8 @@ Public Class FrmMain
     Private Function TreeviewCreateNodes(base As Archiver.Entities.Entity) As TreeNode
         Dim node As New TreeNode(base.Name) With {.Tag = base.Guid}
         Select Case base.Type
-            Case EntityType.Root
-                For Each Entity As Archiver.Entities.Entity In CType(base, Archiver.Entities.Root).Content
+            Case EntityType.Entrypoint
+                For Each Entity As Archiver.Entities.Entity In CType(base, Archiver.Entities.Entrypoint).Content
                     node.Nodes.Add(Me.TreeviewCreateNodes(Entity))
                 Next
             Case EntityType.Directory

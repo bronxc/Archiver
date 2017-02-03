@@ -10,18 +10,20 @@
                     Me.Content = New Byte(Convert.ToInt32(br.BaseStream.Length)) {}
                     br.ReadBytes(Me.Content.Length).CopyTo(Me.Content, 0)
                 End Using
-                Me.Checksum = Me.Content.ToCrc32
+                Me.Checksum = Hashing.Checksums.Fletcher32(Me.Content)
                 Me.Created = New IO.FileInfo(Filename).CreationTime
+                Me.Extension = IO.Path.GetExtension(Filename)
             Else
                 Me.Content = New Byte() {}
             End If
         End Sub
         Public Overrides Function ToString() As String
-            Return String.Format("{0} {1} {2} bytes", Me.Type, Me.Name, Me.Content.Length)
+            Return String.Format("{0} [0x{1}]", Me.Content.Length.SizeToReadableForm, Me.Checksum.ToString("X2"))
         End Function
         Public Property Content As Byte()
         Public Property Length As Integer
         Public Property Checksum As UInt32
+        Public Property Extension As String
         Public Property Parent As Entity
     End Class
 End Namespace

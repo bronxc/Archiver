@@ -36,6 +36,7 @@ Partial Class FrmMain
         '
         'ArchiveTree
         '
+        Me.ArchiveTree.Font = New System.Drawing.Font("Lucida Console", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.ArchiveTree.Location = New System.Drawing.Point(12, 46)
         Me.ArchiveTree.Name = "ArchiveTree"
         Me.ArchiveTree.Size = New System.Drawing.Size(318, 504)
@@ -88,7 +89,7 @@ Partial Class FrmMain
         '
         'btnExtracAll
         '
-        Me.btnExtracAll.Location = New System.Drawing.Point(744, 10)
+        Me.btnExtracAll.Location = New System.Drawing.Point(822, 11)
         Me.btnExtracAll.Name = "btnExtracAll"
         Me.btnExtracAll.Size = New System.Drawing.Size(77, 29)
         Me.btnExtracAll.TabIndex = 8
@@ -97,11 +98,12 @@ Partial Class FrmMain
         '
         'Details
         '
+        Me.Details.Font = New System.Drawing.Font("Lucida Console", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.Details.GridLines = True
         Me.Details.Location = New System.Drawing.Point(336, 46)
         Me.Details.MultiSelect = False
         Me.Details.Name = "Details"
-        Me.Details.Size = New System.Drawing.Size(485, 504)
+        Me.Details.Size = New System.Drawing.Size(563, 504)
         Me.Details.TabIndex = 9
         Me.Details.UseCompatibleStateImageBehavior = False
         Me.Details.View = System.Windows.Forms.View.Details
@@ -128,7 +130,7 @@ Partial Class FrmMain
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(833, 562)
+        Me.ClientSize = New System.Drawing.Size(911, 562)
         Me.Controls.Add(Me.btnTreeHide)
         Me.Controls.Add(Me.btnTreeShow)
         Me.Controls.Add(Me.Details)

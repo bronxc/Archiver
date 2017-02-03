@@ -67,9 +67,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BackgroundWorker.vb" />
+    <Compile Include="Hashing\Checksums.vb" />
     <Compile Include="Constants.vb" />
     <Compile Include="Entities\Directory.vb" />
-    <Compile Include="Entities\Readme.vb" />
     <Compile Include="Extensions.vb" />
     <Compile Include="Entities\File.vb" />
     <Compile Include="Enums.vb" />
@@ -92,7 +92,7 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
     <Compile Include="Provider.vb" />
-    <Compile Include="Entities\Root.vb" />
+    <Compile Include="Entities\Entrypoint.vb" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="My Project\Resources.resx">

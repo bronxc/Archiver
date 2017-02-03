@@ -21,7 +21,7 @@
         Public Function ExtractTo(Directory As String, Optional Overwrite As Boolean = False) As Boolean
             Try
                 Dim output As String = String.Format("{0}\{1}", Directory, Me.GetPath)
-                If (Me.Type = EntityType.Root) Then
+                If (Me.Type = EntityType.Entrypoint) Then
                     Dim folder As New IO.DirectoryInfo(output)
                     If (Not folder.Exists) Then
                         folder.Create()

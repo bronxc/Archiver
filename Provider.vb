@@ -5,37 +5,37 @@ Imports System.Text
 
 Public Class Provider
     Public Sub Create(Name As String)
-        Me.Root = New Root(Name, Me.RetrieveLocalSignatureKey)
+        Me.Entrypoint = New Entrypoint(Name)
     End Sub
     Public Sub Open(filename As String)
         If (IO.File.Exists(filename)) Then
-            If (Not New Header.Reader().IntegrityCheck(Of Root)(filename, Constants.Signature, Me.Root)) Then
+            If (Not New Header.Reader().IntegrityCheck(Of Entrypoint)(filename, Constants.Signature, Me.Entrypoint)) Then
                 Throw New Exception(String.Format("Unable to fetch header from '{0}'", New IO.FileInfo(filename).Name))
             End If
         End If
     End Sub
     Public Sub AddDirectory(Path As String)
-        If (Me.Root Is Nothing) Then
-            Me.Root = New Root("root", Me.RetrieveLocalSignatureKey)
+        If (Me.Entrypoint Is Nothing) Then
+            Me.Entrypoint = New Entrypoint("Entrypoint")
         End If
-        Me.ScanDirectory(New IO.DirectoryInfo(Path), Me.Root)
+        Me.ScanDirectory(New IO.DirectoryInfo(Path), Me.Entrypoint)
     End Sub
     Public Sub AddDirectory(Path As String, Parent As Entity)
-        If (Parent IsNot Nothing AndAlso Parent.Type = EntityType.Root Or Parent.Type = EntityType.Directory) Then
+        If (Parent IsNot Nothing AndAlso Parent.Type = EntityType.Entrypoint Or Parent.Type = EntityType.Directory) Then
             Me.ScanDirectory(New IO.DirectoryInfo(Path), Parent)
         End If
     End Sub
     Public Sub AddFile(Filename As String)
         If (IO.File.Exists(Filename)) Then
-            If (Me.Root Is Nothing) Then
-                Me.Root = New Root("root", Me.RetrieveLocalSignatureKey)
+            If (Me.Entrypoint Is Nothing) Then
+                Me.Entrypoint = New Entrypoint("Entrypoint")
             End If
-            Me.CreateEntity(Filename, EntityType.File, Me.Root)
+            Me.CreateEntity(Filename, EntityType.File, Me.Entrypoint)
         End If
     End Sub
     Public Sub AddFile(Filename As String, Parent As Entity)
         If (IO.File.Exists(Filename) AndAlso Parent IsNot Nothing) Then
-            If (Parent Is Nothing AndAlso Parent.Type = EntityType.Root Or Parent.Type = EntityType.Directory) Then
+            If (Parent Is Nothing AndAlso Parent.Type = EntityType.Entrypoint Or Parent.Type = EntityType.Directory) Then
                 Me.CreateEntity(Filename, EntityType.File, Parent)
             Else
                 Throw New Exception(String.Format("Current entity '{0}' does not accept sub items", Parent.Type))
@@ -46,7 +46,7 @@ Public Class Provider
         If (IO.File.Exists(Filename) AndAlso Overwrite) Then
             IO.File.Delete(Filename)
         End If
-        If (Me.Root IsNot Nothing AndAlso Not New Header.Writer().Build(Me.Root, Constants.Signature, Filename, Level)) Then
+        If (Me.Entrypoint IsNot Nothing AndAlso Not New Header.Writer().Build(Me.Entrypoint, Constants.Signature, Filename, Level)) Then
             Throw New Exception(String.Format("Unable to create header for '{0}'", New IO.FileInfo(Filename).Name))
         End If
     End Sub
@@ -55,11 +55,11 @@ Public Class Provider
         Target.ExtractTo(Output)
 
         Select Case Target.Type
-            Case EntityType.Root
-                CType(Target, Root).Content.ForEach(Sub(entity)
-                                                        entity.ExtractTo(Output)
-                                                        Me.Extract(Output, entity)
-                                                    End Sub)
+            Case EntityType.Entrypoint
+                CType(Target, Entrypoint).Content.ForEach(Sub(entity)
+                                                              entity.ExtractTo(Output)
+                                                              Me.Extract(Output, entity)
+                                                          End Sub)
             Case EntityType.Directory
                 CType(Target, Directory).Content.ForEach(Sub(entity)
                                                              entity.ExtractTo(Output)
@@ -83,8 +83,8 @@ Public Class Provider
         Dim result As Entity = Nothing
         If (Type = EntityType.Directory) Then
             Dim directory As New Directory(Name, Parent)
-            If (Parent.Type = EntityType.Root) Then
-                CType(Parent, Root).Content.Add(directory)
+            If (Parent.Type = EntityType.Entrypoint) Then
+                CType(Parent, Entrypoint).Content.Add(directory)
                 result = directory
             ElseIf (Parent.Type = EntityType.Directory) Then
                 CType(Parent, Directory).Content.Add(directory)
@@ -93,12 +93,13 @@ Public Class Provider
                 Throw New Exception(String.Format("Current entity '{0}' does not accept sub items", Parent.Type))
             End If
         ElseIf (Type = EntityType.File) Then
-            Dim file As New File(Name, Parent)
+            Dim file As Entities.Entity = Nothing
+            file = New File(Name, Parent)
             If (Parent.Type = EntityType.Directory) Then
                 CType(Parent, Directory).Content.Add(file)
                 result = file
-            ElseIf (Parent.Type = EntityType.Root) Then
-                CType(Parent, Root).Content.Add(file)
+            ElseIf (Parent.Type = EntityType.Entrypoint) Then
+                CType(Parent, Entrypoint).Content.Add(file)
                 result = file
             Else
                 Throw New Exception(String.Format("Current entity '{0}' does not accept sub items", Parent.Type))
@@ -106,8 +107,8 @@ Public Class Provider
         End If
         Return result
     End Function
-    Private Function RetrieveLocalSignatureKey() As Byte()
-        Return Encoding.ASCII.GetBytes(Registry.GetValue(Constants.ID_HKLM, Constants.ID_KEY, "0000").ToString.Replace("-"c, String.Empty))
+    Private Function IsReadme(Filename As String) As Boolean
+        Return New IO.FileInfo(Filename).Exists AndAlso New IO.FileInfo(Filename).Name.Equals("readme.md", StringComparison.OrdinalIgnoreCase)
     End Function
-    Public Property Root As Root
+    Public Property Entrypoint As Entrypoint
 End Class
