@@ -1,4 +1,5 @@
-﻿Public Class Provider
+﻿Imports System.IO.Compression
+Public Class Provider
     Public Sub CreateNew(Name As String)
         Me.Root = New Root(Name)
     End Sub
@@ -15,9 +16,9 @@
         End If
         Me.ScanDirectory(New IO.DirectoryInfo(Path), Me.Root)
     End Sub
-    Public Sub AddDirectory(Path As String, base As Entity)
-        If (base IsNot Nothing AndAlso base.Type = EntityType.Root Or base.Type = EntityType.Directory) Then
-            Me.ScanDirectory(New IO.DirectoryInfo(Path), base)
+    Public Sub AddDirectory(Path As String, Parent As Entity)
+        If (Parent IsNot Nothing AndAlso Parent.Type = EntityType.Root Or Parent.Type = EntityType.Directory) Then
+            Me.ScanDirectory(New IO.DirectoryInfo(Path), Parent)
         End If
     End Sub
     Public Sub AddFile(Filename As String)
@@ -28,23 +29,21 @@
             Me.CreateEntity(Filename, EntityType.File, Me.Root)
         End If
     End Sub
-    Public Sub AddFile(Filename As String, base As Entity)
-        If (IO.File.Exists(Filename) AndAlso base IsNot Nothing) Then
-            If (base Is Nothing AndAlso base.Type = EntityType.Root Or base.Type = EntityType.Directory) Then
-                Me.CreateEntity(Filename, EntityType.File, base)
+    Public Sub AddFile(Filename As String, Parent As Entity)
+        If (IO.File.Exists(Filename) AndAlso Parent IsNot Nothing) Then
+            If (Parent Is Nothing AndAlso Parent.Type = EntityType.Root Or Parent.Type = EntityType.Directory) Then
+                Me.CreateEntity(Filename, EntityType.File, Parent)
             Else
-                Throw New Exception(String.Format("Current entity '{0}' does not accept sub items", base.Type))
+                Throw New Exception(String.Format("Current entity '{0}' does not accept sub items", Parent.Type))
             End If
         End If
     End Sub
-    Public Sub SaveAs(Filename As String, Optional Overwrite As Boolean = False, Optional Level As IO.Compression.CompressionLevel = IO.Compression.CompressionLevel.Fastest)
+    Public Sub SaveAs(Filename As String, Optional Overwrite As Boolean = False, Optional Level As CompressionLevel = CompressionLevel.Fastest)
         If (IO.File.Exists(Filename) AndAlso Overwrite) Then
             IO.File.Delete(Filename)
         End If
-        If (Me.Root IsNot Nothing) Then
-            If (Not New Header.Writer().Build(Me.Root, Constants.Signature, Filename, Level)) Then
-                Throw New Exception(String.Format("Unable to create header for '{0}'", New IO.FileInfo(Filename).Name))
-            End If
+        If (Me.Root IsNot Nothing AndAlso Not New Header.Writer().Build(Me.Root, Constants.Signature, Filename, Level)) Then
+            Throw New Exception(String.Format("Unable to create header for '{0}'", New IO.FileInfo(Filename).Name))
         End If
     End Sub
     Public Sub Extract(Output As String, Target As Entity)

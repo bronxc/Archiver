@@ -1,10 +1,10 @@
 ﻿<Serializable>
 Public MustInherit Class Entity
     Sub New(Name As String, Type As EntityType)
-        Me.m_name = Name
-        Me.m_type = Type
-        Me.m_created = DateTime.Now
-        Me.m_guid = New Byte(3) {}.Randomize.ToHexString
+        Me.Name = Name
+        Me.Type = Type
+        Me.Guid = New Byte(3) {}.Randomize.ToHexString
+        Me.Created = DateTime.Now
     End Sub
     Public Function FindByGuid(match As String, ByRef result As List(Of Entity)) As Boolean
         Me.FindGuidLike(match, result)
@@ -45,33 +45,8 @@ Public MustInherit Class Entity
         End Try
     End Function
     Public MustOverride Overrides Function ToString() As String
-    Public ReadOnly Property Path As String
-        Get
-            Return Me.GetPath
-        End Get
-    End Property
-    Private m_type As EntityType
-    Public ReadOnly Property Type As EntityType
-        Get
-            Return Me.m_type
-        End Get
-    End Property
-    Private m_guid As String
-    Public ReadOnly Property Guid As String
-        Get
-            Return Me.m_guid
-        End Get
-    End Property
-    Private m_name As String
-    Public ReadOnly Property Name As String
-        Get
-            Return Me.m_name
-        End Get
-    End Property
-    Private m_created As DateTime
-    Public ReadOnly Property Created As DateTime
-        Get
-            Return Me.m_created
-        End Get
-    End Property
+    Public Property Created As DateTime
+    Public Property Type As EntityType
+    Public Property Guid As String
+    Public Property Name As String
 End Class
