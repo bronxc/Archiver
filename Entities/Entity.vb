@@ -8,19 +8,17 @@
             Me.Created = DateTime.Now
         End Sub
         Public Function FindByGuid(match As String, ByRef result As List(Of Entity)) As Boolean
-            Me.FindGuidLike(match, result)
-            Return result.Any
+            Return Me.MatchGuid(match, result)
         End Function
         Public Function FindByName(match As String, ByRef result As List(Of Entity)) As Boolean
-            Me.FindNameLike(match, result)
-            Return result.Any
+            Return Me.MatchName(match, result)
         End Function
-        Public Function TryResolve(path As String, ByRef result As Entity) As Boolean
-            Return Me.TryResolvePath(path, result)
+        Public Function TryResolve(pathName As String, ByRef result As Entity) As Boolean
+            Return Me.TryResolvePath(pathName, result)
         End Function
-        Public Function ExtractTo(Directory As String, Optional Overwrite As Boolean = False) As Boolean
+        Public Function ExtractTo(pathName As String, Optional Overwrite As Boolean = False) As Boolean
             Try
-                Dim output As String = String.Format("{0}\{1}", Directory, Me.GetPath)
+                Dim output As String = String.Format("{0}\{1}", pathName, Me.GetPath)
                 If (Me.Type = EntityType.Entrypoint) Then
                     Dim folder As New IO.DirectoryInfo(output)
                     If (Not folder.Exists) Then
@@ -45,6 +43,24 @@
                 Return False
             End Try
         End Function
+        Public Sub Delete()
+            If (Me.Type = EntityType.Directory) Then Me.Delete(CType(Me, Directory))
+            If (Me.Type = EntityType.File) Then Me.Delete(CType(Me, File))
+        End Sub
+        Protected Friend Sub Delete(this As Directory)
+            If (this.Parent.Type = EntityType.Entrypoint) Then
+                CType(this.Parent, Entrypoint).Content.Remove(this)
+            ElseIf (this.Parent.Type = EntityType.Directory) Then
+                CType(this.Parent, Entrypoint).Content.Remove(this)
+            End If
+        End Sub
+        Protected Friend Sub Delete(this As File)
+            If (this.Parent.Type = EntityType.Entrypoint) Then
+                CType(this.Parent, Entrypoint).Content.Remove(this)
+            ElseIf (this.Parent.Type = EntityType.Directory) Then
+                CType(this.Parent, Entrypoint).Content.Remove(this)
+            End If
+        End Sub
         Public MustOverride Overrides Function ToString() As String
         Public Property Created As DateTime
         Public Property Type As EntityType

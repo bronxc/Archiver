@@ -4,12 +4,15 @@ Imports Microsoft.Win32
 Imports System.Text
 
 Public Class Provider
+    Public Event Searching(Current As String)
+    Public Event ProgressionRead(Read As Int64, Total As Int64)
+    Public Event ProgressionWrite(Read As Int64, Total As Int64)
     Public Sub Create(Name As String)
         Me.Entrypoint = New Entrypoint(Name)
     End Sub
     Public Sub Open(filename As String)
         If (IO.File.Exists(filename)) Then
-            If (Not New Header.Reader().IntegrityCheck(Of Entrypoint)(filename, Constants.Signature, Me.Entrypoint)) Then
+            If (Not New Header.Reader().IntegrityCheck(Of Entrypoint)(filename, Constants.Signature, Me.Entrypoint, Sub(x, y) RaiseEvent ProgressionRead(x, y))) Then
                 Throw New Exception(String.Format("Unable to fetch header from '{0}'", New IO.FileInfo(filename).Name))
             End If
         End If
@@ -46,7 +49,7 @@ Public Class Provider
         If (IO.File.Exists(Filename) AndAlso Overwrite) Then
             IO.File.Delete(Filename)
         End If
-        If (Me.Entrypoint IsNot Nothing AndAlso Not New Header.Writer().Build(Me.Entrypoint, Constants.Signature, Filename, Level)) Then
+        If (Me.Entrypoint IsNot Nothing AndAlso Not New Header.Writer().Build(Me.Entrypoint, Constants.Signature, Filename, Sub(x, y) RaiseEvent ProgressionWrite(x, y), Level)) Then
             Throw New Exception(String.Format("Unable to create header for '{0}'", New IO.FileInfo(Filename).Name))
         End If
     End Sub
@@ -70,6 +73,7 @@ Public Class Provider
     Private Sub ScanDirectory(directory As IO.DirectoryInfo, Parent As Entity)
         For Each x As IO.DirectoryInfo In directory.GetDirectories()
             Try
+                RaiseEvent Searching(x.FullName)
                 Me.ScanDirectory(x, Me.CreateEntity(x.Name, EntityType.Directory, Parent))
             Catch ex As UnauthorizedAccessException
                 'No access to folder, skip it
@@ -78,6 +82,7 @@ Public Class Provider
         For Each y As IO.FileInfo In directory.GetFiles()
             Me.CreateEntity(y.FullName, EntityType.File, Parent)
         Next
+        RaiseEvent Searching("Ready")
     End Sub
     Private Function CreateEntity(Name As String, Type As EntityType, Parent As Entity) As Entity
         Dim result As Entity = Nothing

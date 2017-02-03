@@ -1,11 +1,18 @@
 ﻿Imports System.Reflection
+Imports Archiver.Entities
+
 Public Class FrmMain
     Private Property Provider As Archiver.Provider
     Private Sub FrmMain_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Me.Provider = New Provider
-        Me.Details.Columns.Add("Name", Me.Details.ClientRectangle.Width \ 3, HorizontalAlignment.Left)
-        Me.Details.Columns.Add("Type", Me.Details.ClientRectangle.Width \ 3, HorizontalAlignment.Left)
-        Me.Details.Columns.Add("Details", Me.Details.ClientRectangle.Width \ 3, HorizontalAlignment.Left)
+        AddHandler Me.Provider.Searching, AddressOf Me.ProviderSearching
+        AddHandler Me.Provider.ProgressionRead, AddressOf Me.ProviderProgress
+        AddHandler Me.Provider.ProgressionWrite, AddressOf Me.ProviderProgress
+
+
+        Me.lvDetails.Columns.Add("Name", Me.lvDetails.ClientRectangle.Width \ 3, HorizontalAlignment.Left)
+        Me.lvDetails.Columns.Add("Type", Me.lvDetails.ClientRectangle.Width \ 3, HorizontalAlignment.Left)
+        Me.lvDetails.Columns.Add("Details", Me.lvDetails.ClientRectangle.Width \ 3, HorizontalAlignment.Left)
     End Sub
     Private Sub btnNew_Click(sender As Object, e As EventArgs) Handles btnNew.Click
         Me.Provider.Create("Entrypoint")
@@ -89,30 +96,85 @@ Public Class FrmMain
             Me.ArchiveTree.Nodes(0).Expand()
         End If
     End Sub
+    Private Sub ArchiveTree_MouseClick(sender As Object, e As MouseEventArgs) Handles ArchiveTree.MouseClick
+        If (e.Button = Windows.Forms.MouseButtons.Right) Then
+            If (Me.ArchiveTree.SelectedNode IsNot Nothing) Then
+                Me.mneQuickMenu.Show(Me.ArchiveTree.PointToScreen(e.Location))
+            End If
+        End If
+    End Sub
+    Private Sub ExtractToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ExtractToolStripMenuItem.Click
+
+    End Sub
+    Private Sub EditToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles EditToolStripMenuItem.Click
+
+    End Sub
+    Private Sub RemoveToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles RemoveToolStripMenuItem.Click
+        If (TypeOf Me.ArchiveTree.SelectedNode.Tag Is String) Then
+            Dim results As New List(Of Entity)
+            Dim guid As String = Me.ArchiveTree.SelectedNode.Tag.ToString
+            If (Me.Provider.Entrypoint.FindByGuid(guid, results)) Then
+                If (results.First.Type = EntityType.Entrypoint) Then
+                    If (Me.AreYouSure("Confirm deletion: Everything!") = DialogResult.OK) Then
+                        Me.btnNew.PerformClick()
+                    End If
+                ElseIf (results.First.Type = EntityType.Directory) Then
+                    If (Me.AreYouSure(String.Format("Confirm deletion: '{0}'", results.First.Name)) = DialogResult.OK) Then
+                        results.First.Delete()
+                        Me.TreeviewUpdate(Me.ArchiveTree, Me.Provider, True)
+                    End If
+                ElseIf (results.First.Type = EntityType.File) Then
+                    If (Me.AreYouSure(String.Format("Confirm deletion: '{0}'", results.First.Name)) = DialogResult.OK) Then
+                        results.First.Delete()
+                        Me.TreeviewUpdate(Me.ArchiveTree, Me.Provider, True)
+                    End If
+                End If
+            End If
+        End If
+    End Sub
     Private Sub ArchiveTree_AfterSelect(sender As Object, e As TreeViewEventArgs) Handles ArchiveTree.AfterSelect
         Dim result As New List(Of Archiver.Entities.Entity)
         If (Me.Provider.Entrypoint.FindByGuid(e.Node.Tag.ToString, result)) Then
-            Me.Details.Items.Clear()
+            Me.lvDetails.Items.Clear()
             Me.UpdateDetails(result.First)
         Else
-            Me.Details.Items.Clear()
+            Me.lvDetails.Items.Clear()
+        End If
+    End Sub
+    Private Sub ProviderSearching(Current As String)
+        If (Me.StatusStrip.InvokeRequired) Then
+            Me.StatusStrip.Invoke(Sub() Me.ProviderSearching(Current))
+        Else
+            Me.StripStatusText.Text = Current
+        End If
+    End Sub
+    Private Sub ProviderProgress(Read As Long, Total As Long)
+        If (Me.StatusStrip.InvokeRequired) Then
+            Me.StatusStrip.Invoke(Sub() Me.ProviderProgress(Read, Total))
+        Else
+            If (Total = 0) Then
+                Me.ToolStripProgressBar.Value = 0
+            Else
+                Me.ToolStripProgressBar.Maximum = Convert.ToInt32(Total)
+                Me.ToolStripProgressBar.Value = Convert.ToInt32(Read)
+            End If
         End If
     End Sub
     Private Sub UpdateDetails(selected As Archiver.Entities.Entity)
 
-        Dim lvitem As ListViewItem = Me.Details.Items.Add(selected.Name)
+        Dim lvitem As ListViewItem = Me.lvDetails.Items.Add(selected.Name)
         lvitem.SubItems.Add(selected.Type.ToString)
         lvitem.SubItems.Add(selected.ToString)
 
         If (selected.Type = EntityType.Entrypoint) Then
-            For Each e As Archiver.Entities.Entity In CType(selected, Archiver.Entities.Entrypoint).Content
-                lvitem = Me.Details.Items.Add(String.Format("- {0}", e.Name))
+            For Each e As Entity In CType(selected, Entrypoint).Content
+                lvitem = Me.lvDetails.Items.Add(String.Format("- {0}", e.Name))
                 lvitem.SubItems.Add(e.Type.ToString)
                 lvitem.SubItems.Add(e.ToString)
             Next
         ElseIf (selected.Type = EntityType.Directory) Then
-            For Each e As Archiver.Entities.Entity In CType(selected, Archiver.Entities.Directory).Content
-                lvitem = Me.Details.Items.Add(String.Format("- {0}", e.Name))
+            For Each e As Entity In CType(selected, Directory).Content
+                lvitem = Me.lvDetails.Items.Add(String.Format("- {0}", e.Name))
                 lvitem.SubItems.Add(e.Type.ToString)
                 lvitem.SubItems.Add(e.ToString)
             Next
@@ -132,7 +194,7 @@ Public Class FrmMain
             Me.btnTreeShow.Enabled = bool
         End If
     End Sub
-    Private Sub TreeviewUpdate(ctrl As TreeView, provider As Archiver.Provider, clear As Boolean)
+    Private Sub TreeviewUpdate(ctrl As TreeView, provider As Provider, clear As Boolean)
         If (ctrl.InvokeRequired) Then
             ctrl.Invoke(Sub() Me.TreeviewUpdate(ctrl, provider, clear))
         Else
@@ -140,7 +202,7 @@ Public Class FrmMain
                 With ctrl
                     If (clear) Then
                         .Nodes.Clear()
-                        Me.Details.Items.Clear()
+                        Me.lvDetails.Items.Clear()
                     End If
                     .BeginUpdate()
                     .Nodes.Add(Me.TreeviewCreateNodes(provider.Entrypoint))
@@ -154,18 +216,21 @@ Public Class FrmMain
 
         End If
     End Sub
-    Private Function TreeviewCreateNodes(base As Archiver.Entities.Entity) As TreeNode
+    Private Function TreeviewCreateNodes(base As Entity) As TreeNode
         Dim node As New TreeNode(base.Name) With {.Tag = base.Guid}
         Select Case base.Type
             Case EntityType.Entrypoint
-                For Each Entity As Archiver.Entities.Entity In CType(base, Archiver.Entities.Entrypoint).Content
+                For Each Entity As Entity In CType(base, Entrypoint).Content
                     node.Nodes.Add(Me.TreeviewCreateNodes(Entity))
                 Next
             Case EntityType.Directory
-                For Each Entity As Archiver.Entities.Entity In CType(base, Archiver.Entities.Directory).Content
+                For Each Entity As Entity In CType(base, Directory).Content
                     node.Nodes.Add(Me.TreeviewCreateNodes(Entity))
                 Next
         End Select
         Return node
+    End Function
+    Private Function AreYouSure(Message As String) As DialogResult
+        Return MessageBox.Show(Message, "Warning", MessageBoxButtons.OKCancel, MessageBoxIcon.Exclamation)
     End Function
 End Class

@@ -3,13 +3,13 @@ Imports System.Runtime.CompilerServices
 Imports Archiver.Entities
 
 Module Extensions
-    <Extension> Public Function SizeToReadableForm(byteCount As Integer) As String
+    <Extension> Public Function GetSizeReadableForm(byteCount As Integer) As String
         Static Suffix As String() = {"b", "kb", "mb", "gb"}
         If byteCount = 0 Then Return "0" + Suffix(0)
         Dim place As Integer = Convert.ToInt32(Math.Floor(Math.Log(Math.Abs(byteCount), 1024)))
         Return (Math.Sign(byteCount) * Math.Round(Math.Abs(byteCount) / Math.Pow(1024, place), 1)).ToString() + Suffix(place)
     End Function
-    <Extension> Public Sub FindGuidLike(e As Entity, match As String, ByRef Result As List(Of Entity))
+    <Extension> Public Function MatchGuid(e As Entity, match As String, ByRef Result As List(Of Entity)) As Boolean
         If (e.Guid Like match AndAlso Not Result.Contains(e)) Then
             Result.Add(e)
         End If
@@ -19,22 +19,23 @@ Module Extensions
                     If (ent.Guid Like match AndAlso Not Result.Contains(ent)) Then
                         Result.Add(ent)
                     End If
-                    ent.FindGuidLike(match, Result)
+                    ent.MatchGuid(match, Result)
                 Next
             Case EntityType.Directory
                 For Each ent As Entity In CType(e, Directory).Content
                     If (ent.Guid Like match AndAlso Not Result.Contains(ent)) Then
                         Result.Add(ent)
                     End If
-                    ent.FindGuidLike(match, Result)
+                    ent.MatchGuid(match, Result)
                 Next
             Case EntityType.File
                 If (e.Guid Like match AndAlso Not Result.Contains(e)) Then
                     Result.Add(e)
                 End If
         End Select
-    End Sub
-    <Extension> Public Sub FindNameLike(e As Entity, match As String, ByRef Result As List(Of Entity))
+        Return Result.Any
+    End Function
+    <Extension> Public Function MatchName(e As Entity, match As String, ByRef Result As List(Of Entity)) As Boolean
         If (e.Name Like match AndAlso Not Result.Contains(e)) Then
             Result.Add(e)
         End If
@@ -44,25 +45,25 @@ Module Extensions
                     If (ent.Name Like match AndAlso Not Result.Contains(ent)) Then
                         Result.Add(ent)
                     End If
-                    ent.FindNameLike(match, Result)
+                    ent.MatchName(match, Result)
                 Next
             Case EntityType.Directory
                 For Each ent As Entity In CType(e, Directory).Content
                     If (ent.Name Like match AndAlso Not Result.Contains(ent)) Then
                         Result.Add(ent)
                     End If
-                    ent.FindNameLike(match, Result)
+                    ent.MatchName(match, Result)
                 Next
             Case EntityType.File
                 If (e.Name Like match AndAlso Not Result.Contains(e)) Then
                     Result.Add(e)
                 End If
         End Select
-    End Sub
-    <Extension> Public Function TryResolvePath(e As Entity, path As String, ByRef result As Entity) As Boolean
-        If (path.Length > 0) Then
-            path = path.NormalizePath
-            Dim entities() As String = path.Split("\"c)
+        Return Result.Any
+    End Function
+    <Extension> Public Function TryResolvePath(e As Entity, pathName As String, ByRef result As Entity) As Boolean
+        If (pathName.Length > 0) Then
+            Dim entities() As String = pathName.NormalizePath.Split("\"c)
             Dim found As Entity = Nothing, nextitem As Entity = Nothing, i As Integer = 0
             found = e
             Do While i <= entities.Count - 1

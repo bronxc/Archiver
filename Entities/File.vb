@@ -18,7 +18,7 @@
             End If
         End Sub
         Public Overrides Function ToString() As String
-            Return String.Format("{0} [0x{1}]", Me.Content.Length.SizeToReadableForm, Me.Checksum.ToString("X2"))
+            Return String.Format("{0} [0x{1}]", Me.Content.Length.GetSizeReadableForm, Me.Checksum.ToString("X2"))
         End Function
         Public Property Content As Byte()
         Public Property Length As Integer
