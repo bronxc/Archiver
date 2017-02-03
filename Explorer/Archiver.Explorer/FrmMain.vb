@@ -8,7 +8,8 @@ Public Class FrmMain
         Me.Details.Columns.Add("Type", Me.Details.ClientRectangle.Width \ 3, HorizontalAlignment.Left)
     End Sub
     Private Sub btnNew_Click(sender As Object, e As EventArgs) Handles btnNew.Click
-        Me.Provider.CreateNew("root")
+        Me.Provider.Create("root")
+        Me.SetTitle(Me.Provider.Root.GetSignature)
         Me.TreeviewUpdate(Me.ArchiveTree, Me.Provider, True)
     End Sub
     Private Sub btnAddFile_Click(sender As Object, e As EventArgs) Handles btnAddFile.Click
@@ -47,6 +48,7 @@ Public Class FrmMain
                 BackgroundWorker.Run(Sub()
                                          Me.ButtonsEnabled(False)
                                          Me.Provider.Open(ofd.FileName)
+                                         Me.SetTitle(Me.Provider.Root.GetSignature)
                                          Me.TreeviewUpdate(Me.ArchiveTree, Me.Provider, True)
                                          Me.ButtonsEnabled(True)
                                      End Sub)
@@ -69,7 +71,7 @@ Public Class FrmMain
     Private Sub btnExtracAll_Click(sender As Object, e As EventArgs) Handles btnExtracAll.Click
         If (Me.Provider IsNot Nothing AndAlso Me.Provider.Root IsNot Nothing) Then
             Using ofb As New FolderBrowserDialog With {.Description = "Select folder",
-                                                  .SelectedPath = Application.StartupPath}
+                                                       .SelectedPath = Application.StartupPath}
                 If (ofb.ShowDialog(Me) = Windows.Forms.DialogResult.OK) Then
                     BackgroundWorker.Run(Sub()
                                              Me.ButtonsEnabled(False)
@@ -80,8 +82,17 @@ Public Class FrmMain
             End Using
         End If
     End Sub
+    Private Sub btnTreeShow_Click(sender As Object, e As EventArgs) Handles btnTreeShow.Click
+        Me.ArchiveTree.ExpandAll()
+    End Sub
+    Private Sub btnTreeHide_Click(sender As Object, e As EventArgs) Handles btnTreeHide.Click
+        Me.ArchiveTree.CollapseAll()
+        If (Me.ArchiveTree.Nodes.Count > 0) Then
+            Me.ArchiveTree.Nodes(0).Expand()
+        End If
+    End Sub
     Private Sub ArchiveTree_AfterSelect(sender As Object, e As TreeViewEventArgs) Handles ArchiveTree.AfterSelect
-        Dim result As New List(Of Archiver.Entity)
+        Dim result As New List(Of Archiver.Entities.Entity)
         If (Me.Provider.Root.FindByGuid(e.Node.Tag.ToString, result)) Then
             Me.Details.Items.Clear()
             Me.UpdateDetails(result.First)
@@ -89,20 +100,27 @@ Public Class FrmMain
             Me.Details.Items.Clear()
         End If
     End Sub
-    Private Sub UpdateDetails(selected As Archiver.Entity)
+    Private Sub SetTitle(Title As String)
+        If (Me.InvokeRequired) Then
+            Me.Invoke(Sub() Me.SetTitle(Title))
+        Else
+            Me.Text = String.Format("Archiver [{0}]", Title)
+        End If
+    End Sub
+    Private Sub UpdateDetails(selected As Archiver.Entities.Entity)
 
         Dim lvitem As ListViewItem = Me.Details.Items.Add(selected.Name)
         lvitem.SubItems.Add(selected.Created.ToString)
         lvitem.SubItems.Add(selected.Type.ToString)
 
         If (selected.Type = EntityType.Root) Then
-            For Each e As Archiver.Entity In CType(selected, Archiver.Root).Content
+            For Each e As Archiver.Entities.Entity In CType(selected, Archiver.Entities.Root).Content
                 lvitem = Me.Details.Items.Add(String.Format("..\{0}", e.Name))
                 lvitem.SubItems.Add(e.Created.ToString)
                 lvitem.SubItems.Add(e.Type.ToString)
             Next
         ElseIf (selected.Type = EntityType.Directory) Then
-            For Each e As Archiver.Entity In CType(selected, Archiver.Directory).Content
+            For Each e As Archiver.Entities.Entity In CType(selected, Archiver.Entities.Directory).Content
                 lvitem = Me.Details.Items.Add(String.Format("..\{0}", e.Name))
                 lvitem.SubItems.Add(e.Created.ToString)
                 lvitem.SubItems.Add(e.Type.ToString)
@@ -119,6 +137,8 @@ Public Class FrmMain
             Me.btnOpen.Enabled = bool
             Me.btnSave.Enabled = bool
             Me.btnExtracAll.Enabled = bool
+            Me.btnTreeHide.Enabled = bool
+            Me.btnTreeShow.Enabled = bool
         End If
     End Sub
     Private Sub TreeviewUpdate(ctrl As TreeView, provider As Archiver.Provider, clear As Boolean)
@@ -140,15 +160,15 @@ Public Class FrmMain
 
         End If
     End Sub
-    Private Function TreeviewCreateNodes(base As Archiver.Entity) As TreeNode
+    Private Function TreeviewCreateNodes(base As Archiver.Entities.Entity) As TreeNode
         Dim node As New TreeNode(base.Name) With {.Tag = base.Guid}
         Select Case base.Type
             Case EntityType.Root
-                For Each Entity As Entity In CType(base, Root).Content
+                For Each Entity As Archiver.Entities.Entity In CType(base, Archiver.Entities.Root).Content
                     node.Nodes.Add(Me.TreeviewCreateNodes(Entity))
                 Next
             Case EntityType.Directory
-                For Each Entity As Entity In CType(base, Directory).Content
+                For Each Entity As Archiver.Entities.Entity In CType(base, Archiver.Entities.Directory).Content
                     node.Nodes.Add(Me.TreeviewCreateNodes(Entity))
                 Next
         End Select

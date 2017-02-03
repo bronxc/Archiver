@@ -1,7 +1,11 @@
 ﻿Imports System.IO.Compression
+Imports Archiver.Entities
+Imports Microsoft.Win32
+Imports System.Text
+
 Public Class Provider
-    Public Sub CreateNew(Name As String)
-        Me.Root = New Root(Name)
+    Public Sub Create(Name As String)
+        Me.Root = New Root(Name, Me.RetrieveLocalSignatureKey)
     End Sub
     Public Sub Open(filename As String)
         If (IO.File.Exists(filename)) Then
@@ -12,7 +16,7 @@ Public Class Provider
     End Sub
     Public Sub AddDirectory(Path As String)
         If (Me.Root Is Nothing) Then
-            Me.Root = New Root("root")
+            Me.Root = New Root("root", Me.RetrieveLocalSignatureKey)
         End If
         Me.ScanDirectory(New IO.DirectoryInfo(Path), Me.Root)
     End Sub
@@ -24,7 +28,7 @@ Public Class Provider
     Public Sub AddFile(Filename As String)
         If (IO.File.Exists(Filename)) Then
             If (Me.Root Is Nothing) Then
-                Me.Root = New Root("root")
+                Me.Root = New Root("root", Me.RetrieveLocalSignatureKey)
             End If
             Me.CreateEntity(Filename, EntityType.File, Me.Root)
         End If
@@ -101,6 +105,9 @@ Public Class Provider
             End If
         End If
         Return result
+    End Function
+    Private Function RetrieveLocalSignatureKey() As Byte()
+        Return Encoding.ASCII.GetBytes(Registry.GetValue(Constants.ID_HKLM, Constants.ID_KEY, "0000").ToString.Replace("-"c, String.Empty))
     End Function
     Public Property Root As Root
 End Class

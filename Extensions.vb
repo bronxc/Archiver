@@ -1,8 +1,9 @@
-﻿Imports System.IO
-Imports System.IO.Compression
+﻿Imports System.IO.Compression
 Imports System.Runtime.CompilerServices
+Imports Archiver.Entities
+
 Module Extensions
-   
+
     <Extension>
     Public Sub FindGuidLike(e As Entity, match As String, ByRef Result As List(Of Entity))
         If (e.Guid Like match AndAlso Not Result.Contains(e)) Then
@@ -163,7 +164,7 @@ Module Extensions
     <Extension>
     Public Function Compress(src() As Byte, Optional CompressionLevel As CompressionLevel = CompressionLevel.Fastest) _
         As Byte()
-        Using ms As New MemoryStream
+        Using ms As New IO.MemoryStream
             Using gzs As New DeflateStream(ms, CompressionLevel, True)
                 gzs.Write(src, 0, src.Length)
             End Using
@@ -172,9 +173,9 @@ Module Extensions
     End Function
     <Extension>
     Public Function Decompress(src() As Byte) As Byte()
-        Using gzs As New DeflateStream(New MemoryStream(src), CompressionMode.Decompress)
+        Using gzs As New DeflateStream(New IO.MemoryStream(src), CompressionMode.Decompress)
             Dim length As Integer = 0, buffer As Byte() = New Byte(&H400) {}
-            Using ms As New MemoryStream
+            Using ms As New IO.MemoryStream
                 Do
                     length = gzs.Read(buffer, 0, &H400)
                     If length > 0 Then

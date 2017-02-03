@@ -30,13 +30,15 @@ Partial Class FrmMain
         Me.btnAddFile = New System.Windows.Forms.Button()
         Me.btnExtracAll = New System.Windows.Forms.Button()
         Me.Details = New System.Windows.Forms.ListView()
+        Me.btnTreeShow = New System.Windows.Forms.Button()
+        Me.btnTreeHide = New System.Windows.Forms.Button()
         Me.SuspendLayout()
         '
         'ArchiveTree
         '
         Me.ArchiveTree.Location = New System.Drawing.Point(12, 46)
         Me.ArchiveTree.Name = "ArchiveTree"
-        Me.ArchiveTree.Size = New System.Drawing.Size(267, 298)
+        Me.ArchiveTree.Size = New System.Drawing.Size(318, 504)
         Me.ArchiveTree.TabIndex = 1
         '
         'btnOpen
@@ -68,7 +70,7 @@ Partial Class FrmMain
         '
         'btnAddDirectory
         '
-        Me.btnAddDirectory.Location = New System.Drawing.Point(359, 11)
+        Me.btnAddDirectory.Location = New System.Drawing.Point(410, 11)
         Me.btnAddDirectory.Name = "btnAddDirectory"
         Me.btnAddDirectory.Size = New System.Drawing.Size(68, 29)
         Me.btnAddDirectory.TabIndex = 5
@@ -77,7 +79,7 @@ Partial Class FrmMain
         '
         'btnAddFile
         '
-        Me.btnAddFile.Location = New System.Drawing.Point(285, 11)
+        Me.btnAddFile.Location = New System.Drawing.Point(336, 11)
         Me.btnAddFile.Name = "btnAddFile"
         Me.btnAddFile.Size = New System.Drawing.Size(68, 29)
         Me.btnAddFile.TabIndex = 7
@@ -86,29 +88,49 @@ Partial Class FrmMain
         '
         'btnExtracAll
         '
-        Me.btnExtracAll.Location = New System.Drawing.Point(626, 11)
+        Me.btnExtracAll.Location = New System.Drawing.Point(744, 10)
         Me.btnExtracAll.Name = "btnExtracAll"
         Me.btnExtracAll.Size = New System.Drawing.Size(77, 29)
         Me.btnExtracAll.TabIndex = 8
-        Me.btnExtracAll.Text = "Extract All"
+        Me.btnExtracAll.Text = "Extract"
         Me.btnExtracAll.UseVisualStyleBackColor = True
         '
         'Details
         '
         Me.Details.GridLines = True
-        Me.Details.Location = New System.Drawing.Point(285, 46)
+        Me.Details.Location = New System.Drawing.Point(336, 46)
         Me.Details.MultiSelect = False
         Me.Details.Name = "Details"
-        Me.Details.Size = New System.Drawing.Size(418, 298)
+        Me.Details.Size = New System.Drawing.Size(485, 504)
         Me.Details.TabIndex = 9
         Me.Details.UseCompatibleStateImageBehavior = False
         Me.Details.View = System.Windows.Forms.View.Details
+        '
+        'btnTreeShow
+        '
+        Me.btnTreeShow.Location = New System.Drawing.Point(256, 11)
+        Me.btnTreeShow.Name = "btnTreeShow"
+        Me.btnTreeShow.Size = New System.Drawing.Size(34, 29)
+        Me.btnTreeShow.TabIndex = 10
+        Me.btnTreeShow.Text = "+"
+        Me.btnTreeShow.UseVisualStyleBackColor = True
+        '
+        'btnTreeHide
+        '
+        Me.btnTreeHide.Location = New System.Drawing.Point(296, 11)
+        Me.btnTreeHide.Name = "btnTreeHide"
+        Me.btnTreeHide.Size = New System.Drawing.Size(34, 29)
+        Me.btnTreeHide.TabIndex = 11
+        Me.btnTreeHide.Text = "-"
+        Me.btnTreeHide.UseVisualStyleBackColor = True
         '
         'FrmMain
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(715, 356)
+        Me.ClientSize = New System.Drawing.Size(833, 562)
+        Me.Controls.Add(Me.btnTreeHide)
+        Me.Controls.Add(Me.btnTreeShow)
         Me.Controls.Add(Me.Details)
         Me.Controls.Add(Me.btnExtracAll)
         Me.Controls.Add(Me.btnAddFile)
@@ -134,5 +156,7 @@ Partial Class FrmMain
     Friend WithEvents btnAddFile As System.Windows.Forms.Button
     Friend WithEvents btnExtracAll As System.Windows.Forms.Button
     Friend WithEvents Details As System.Windows.Forms.ListView
+    Friend WithEvents btnTreeShow As System.Windows.Forms.Button
+    Friend WithEvents btnTreeHide As System.Windows.Forms.Button
 
 End Class

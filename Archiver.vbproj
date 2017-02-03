@@ -68,11 +68,12 @@
   <ItemGroup>
     <Compile Include="BackgroundWorker.vb" />
     <Compile Include="Constants.vb" />
-    <Compile Include="Directory.vb" />
+    <Compile Include="Entities\Directory.vb" />
+    <Compile Include="Entities\Readme.vb" />
     <Compile Include="Extensions.vb" />
-    <Compile Include="File.vb" />
+    <Compile Include="Entities\File.vb" />
     <Compile Include="Enums.vb" />
-    <Compile Include="Entity.vb" />
+    <Compile Include="Entities\Entity.vb" />
     <Compile Include="FromByte.vb" />
     <Compile Include="FromObject.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
@@ -91,7 +92,7 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
     <Compile Include="Provider.vb" />
-    <Compile Include="Root.vb" />
+    <Compile Include="Entities\Root.vb" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="My Project\Resources.resx">
