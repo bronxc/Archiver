@@ -39,8 +39,8 @@ Partial Class FrmMain
         Me.btnTreeShow = New System.Windows.Forms.Button()
         Me.btnTreeHide = New System.Windows.Forms.Button()
         Me.StatusStrip = New System.Windows.Forms.StatusStrip()
-        Me.StripStatusText = New System.Windows.Forms.ToolStripStatusLabel()
         Me.ToolStripProgressBar = New System.Windows.Forms.ToolStripProgressBar()
+        Me.StripStatusText = New System.Windows.Forms.ToolStripStatusLabel()
         Me.mneQuickMenu.SuspendLayout()
         Me.StatusStrip.SuspendLayout()
         Me.SuspendLayout()
@@ -176,18 +176,18 @@ Partial Class FrmMain
         Me.StatusStrip.SizingGrip = False
         Me.StatusStrip.TabIndex = 13
         '
-        'StripStatusText
-        '
-        Me.StripStatusText.Name = "StripStatusText"
-        Me.StripStatusText.Size = New System.Drawing.Size(38, 17)
-        Me.StripStatusText.Text = "Status"
-        '
         'ToolStripProgressBar
         '
         Me.ToolStripProgressBar.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right
         Me.ToolStripProgressBar.Name = "ToolStripProgressBar"
         Me.ToolStripProgressBar.Size = New System.Drawing.Size(575, 16)
         Me.ToolStripProgressBar.Style = System.Windows.Forms.ProgressBarStyle.Continuous
+        '
+        'StripStatusText
+        '
+        Me.StripStatusText.Name = "StripStatusText"
+        Me.StripStatusText.Size = New System.Drawing.Size(38, 17)
+        Me.StripStatusText.Text = "Ready"
         '
         'FrmMain
         '
