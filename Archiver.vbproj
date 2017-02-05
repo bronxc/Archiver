@@ -49,6 +49,15 @@
   <PropertyGroup>
     <OptionInfer>On</OptionInfer>
   </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>Archiver.Key.pfx</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <PropertyGroup>
+    <DelaySign>false</DelaySign>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Xml" />
@@ -67,7 +76,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BackgroundWorker.vb" />
-    <Compile Include="Catcher.vb" />
+    <Compile Include="Debugger.vb" />
     <Compile Include="Proxy.vb" />
     <Compile Include="Hashing\Checksums.vb" />
     <Compile Include="Constants.vb" />
@@ -103,6 +112,7 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <None Include="Archiver.Key.pfx" />
     <None Include="My Project\Application.myapp">
       <Generator>MyApplicationCodeGenerator</Generator>
       <LastGenOutput>Application.Designer.vb</LastGenOutput>

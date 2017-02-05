@@ -11,3 +11,4 @@ C:\Users\Barret\Documents\GitHub\Archiver\Explorer\obj\Release\Archiver.Explorer
 C:\Users\Barret\Documents\GitHub\Archiver\Explorer\obj\Release\Archiver.Explorer.vbproj.GenerateResource.Cache
 C:\Users\Barret\Documents\GitHub\Archiver\Explorer\obj\Release\Archiver.Explorer.exe
 C:\Users\Barret\Documents\GitHub\Archiver\Explorer\obj\Release\Archiver.Explorer.pdb
+C:\Users\Barret\Documents\GitHub\Archiver\Explorer\obj\Release\Archiver.Explorer.frmEditor.resources

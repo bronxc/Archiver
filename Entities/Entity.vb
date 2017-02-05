@@ -15,21 +15,16 @@
         Public Function TryResolve(pathName As String, ByRef result As Entity) As Boolean
             Return Me.TryResolvePath(pathName, result)
         End Function
-        Public Function ExtractTo(pathName As String, Optional Overwrite As Boolean = False) As Boolean
+        Public Function Extract(pathName As String, Optional Overwrite As Boolean = False) As Boolean
             Try
-                Dim output As String = String.Format("{0}\{1}", pathName, Me.GetPath)
-                If (Me.Type = EntityType.Entrypoint) Then
-                    Dim folder As New IO.DirectoryInfo(output)
-                    If (Not folder.Exists) Then
-                        folder.Create()
-                    End If
-                ElseIf (Me.Type = EntityType.Directory) Then
-                    Dim folder As New IO.DirectoryInfo(output)
+                pathName = String.Format("{0}\{1}", pathName, Me.GetPath).Replace("\Entrypoint", String.Empty)
+                If (Me.Type = EntityType.Directory) Then
+                    Dim folder As New IO.DirectoryInfo(pathName)
                     If (Not folder.Exists) Then
                         folder.Create()
                     End If
                 ElseIf (Me.Type = EntityType.File) Then
-                    Dim file As New IO.FileInfo(output)
+                    Dim file As New IO.FileInfo(pathName)
                     If (file.Exists AndAlso Overwrite) Then
                         file.Delete()
                     End If
@@ -61,9 +56,13 @@
             End If
         End Sub
         Public MustOverride Overrides Function ToString() As String
-        Public Property Created As DateTime
-        Public Property Type As EntityType
+        <ComponentModel.Description("Unique generated id for location and reference")>
         Public Property Guid As String
+        <ComponentModel.Description("Entity name")>
         Public Property Name As String
+        <ComponentModel.Browsable(False)>
+        Public Property Type As EntityType
+        <ComponentModel.Description("Entity creation time")>
+        Public Property Created As DateTime
     End Class
 End Namespace

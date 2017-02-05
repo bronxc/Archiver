@@ -2,8 +2,18 @@
 Imports System.Runtime.CompilerServices
 Imports Archiver.Entities
 
-Module Extensions
-    <Extension> Public Function GetSizeReadableForm(byteCount As Integer) As String
+Public Module Extensions
+    <Extension> Public Function IsFileLocked(file As IO.FileInfo) As Boolean
+        Try
+            If (Not file.Exists) Then Return False
+            IO.File.Open(file.FullName, IO.FileMode.Open, IO.FileAccess.Read, IO.FileShare.None).Close()
+        Catch ex As IO.IOException
+            Return True
+        End Try
+        Return False
+    End Function
+
+    <Extension> Public Function SizeToReadableForm(byteCount As Integer) As String
         Static Suffix As String() = {"b", "kb", "mb", "gb"}
         If byteCount = 0 Then Return "0" + Suffix(0)
         Dim place As Integer = Convert.ToInt32(Math.Floor(Math.Log(Math.Abs(byteCount), 1024)))
@@ -137,31 +147,6 @@ Module Extensions
         Using rng As New Security.Cryptography.RNGCryptoServiceProvider()
             rng.GetNonZeroBytes(src)
             Return src
-        End Using
-    End Function
-    <Extension>
-    Public Function Compress(src() As Byte, Optional CompressionLevel As CompressionLevel = CompressionLevel.Fastest) _
-        As Byte()
-        Using ms As New IO.MemoryStream
-            Using gzs As New DeflateStream(ms, CompressionLevel, True)
-                gzs.Write(src, 0, src.Length)
-            End Using
-            Return ms.ToArray
-        End Using
-    End Function
-    <Extension>
-    Public Function Decompress(src() As Byte) As Byte()
-        Using gzs As New DeflateStream(New IO.MemoryStream(src), CompressionMode.Decompress)
-            Dim length As Integer = 0, buffer As Byte() = New Byte(&H400) {}
-            Using ms As New IO.MemoryStream
-                Do
-                    length = gzs.Read(buffer, 0, &H400)
-                    If length > 0 Then
-                        ms.Write(buffer, 0, length)
-                    End If
-                Loop While length > 0
-                Return ms.ToArray()
-            End Using
         End Using
     End Function
 End Module

@@ -18,10 +18,13 @@
             End If
         End Sub
         Public Overrides Function ToString() As String
-            Return String.Format("{0} [0x{1}]", Me.Content.Length.GetSizeReadableForm, Me.Checksum.ToString("X2"))
+            Return String.Format("{0} {1} [0x{2}]", Me.Type.ToString, Me.Content.Length.SizeToReadableForm, Me.Checksum.ToString("X2"))
         End Function
+        <ComponentModel.Browsable(False)>
         Public Property Content As Byte()
+        <ComponentModel.Browsable(False)>
         Public Property Length As Integer
+        <ComponentModel.Browsable(False)>
         Public Property Checksum As UInt32
         Public Property Extension As String
         Public Property Parent As Entity
