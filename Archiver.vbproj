@@ -67,6 +67,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BackgroundWorker.vb" />
+    <Compile Include="Catcher.vb" />
+    <Compile Include="Proxy.vb" />
     <Compile Include="Hashing\Checksums.vb" />
     <Compile Include="Constants.vb" />
     <Compile Include="Entities\Directory.vb" />
@@ -74,8 +76,6 @@
     <Compile Include="Entities\File.vb" />
     <Compile Include="Enums.vb" />
     <Compile Include="Entities\Entity.vb" />
-    <Compile Include="FromByte.vb" />
-    <Compile Include="FromObject.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>

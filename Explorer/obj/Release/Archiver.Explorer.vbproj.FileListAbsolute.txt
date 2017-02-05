@@ -1,0 +1,13 @@
+C:\Users\Barret\Documents\GitHub\Archiver\Explorer\bin\Release\Archiver.Explorer.exe.config
+C:\Users\Barret\Documents\GitHub\Archiver\Explorer\bin\Release\Archiver.Explorer.exe
+C:\Users\Barret\Documents\GitHub\Archiver\Explorer\bin\Release\Archiver.Explorer.pdb
+C:\Users\Barret\Documents\GitHub\Archiver\Explorer\bin\Release\Archiver.dll
+C:\Users\Barret\Documents\GitHub\Archiver\Explorer\bin\Release\Header.dll
+C:\Users\Barret\Documents\GitHub\Archiver\Explorer\bin\Release\Archiver.pdb
+C:\Users\Barret\Documents\GitHub\Archiver\Explorer\bin\Release\Header.pdb
+C:\Users\Barret\Documents\GitHub\Archiver\Explorer\obj\Release\Archiver.Explorer.vbprojResolveAssemblyReference.cache
+C:\Users\Barret\Documents\GitHub\Archiver\Explorer\obj\Release\Archiver.Explorer.FrmMain.resources
+C:\Users\Barret\Documents\GitHub\Archiver\Explorer\obj\Release\Archiver.Explorer.Resources.resources
+C:\Users\Barret\Documents\GitHub\Archiver\Explorer\obj\Release\Archiver.Explorer.vbproj.GenerateResource.Cache
+C:\Users\Barret\Documents\GitHub\Archiver\Explorer\obj\Release\Archiver.Explorer.exe
+C:\Users\Barret\Documents\GitHub\Archiver\Explorer\obj\Release\Archiver.Explorer.pdb

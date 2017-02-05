@@ -1,26 +1,22 @@
-﻿Imports System.IO.Compression
-Imports Archiver.Entities
-Imports Microsoft.Win32
-Imports System.Text
-
+﻿Imports Archiver.Entities
 Public Class Provider
-    Public Event Searching(Current As String)
-    Public Event ProgressionRead(Read As Int64, Total As Int64)
-    Public Event ProgressionWrite(Read As Int64, Total As Int64)
+    Inherits Catcher
+    Public Property Entrypoint As Entrypoint
+    Public Event Status(Message As String)
+    Public Event ProgressionRead(Position As Int64, Total As Int64)
+    Public Event ProgressionWrite(Position As Int64, Total As Int64)
     Public Sub Create(Name As String)
         Me.Entrypoint = New Entrypoint(Name)
     End Sub
     Public Sub Open(filename As String)
         If (IO.File.Exists(filename)) Then
-            If (Not New Header.Reader().IntegrityCheck(Of Entrypoint)(filename, Constants.Signature, Me.Entrypoint, Sub(x, y) RaiseEvent ProgressionRead(x, y))) Then
+            If (Not New Header.Reader().IntegrityCheck(Of Entrypoint)(filename, Constants.Signature, Me.Entrypoint, AddressOf Me.Decompression)) Then
                 Throw New Exception(String.Format("Unable to fetch header from '{0}'", New IO.FileInfo(filename).Name))
             End If
         End If
     End Sub
     Public Sub AddDirectory(Path As String)
-        If (Me.Entrypoint Is Nothing) Then
-            Me.Entrypoint = New Entrypoint("Entrypoint")
-        End If
+        If (Me.Entrypoint Is Nothing) Then Me.Create("Entrypoint")
         Me.ScanDirectory(New IO.DirectoryInfo(Path), Me.Entrypoint)
     End Sub
     Public Sub AddDirectory(Path As String, Parent As Entity)
@@ -30,9 +26,7 @@ Public Class Provider
     End Sub
     Public Sub AddFile(Filename As String)
         If (IO.File.Exists(Filename)) Then
-            If (Me.Entrypoint Is Nothing) Then
-                Me.Entrypoint = New Entrypoint("Entrypoint")
-            End If
+            If (Me.Entrypoint Is Nothing) Then Me.Create("Entrypoint")
             Me.CreateEntity(Filename, EntityType.File, Me.Entrypoint)
         End If
     End Sub
@@ -45,11 +39,11 @@ Public Class Provider
             End If
         End If
     End Sub
-    Public Sub SaveAs(Filename As String, Optional Overwrite As Boolean = False, Optional Level As CompressionLevel = CompressionLevel.Fastest)
+    Public Sub SaveAs(Filename As String, Optional Overwrite As Boolean = False)
         If (IO.File.Exists(Filename) AndAlso Overwrite) Then
             IO.File.Delete(Filename)
         End If
-        If (Me.Entrypoint IsNot Nothing AndAlso Not New Header.Writer().Build(Me.Entrypoint, Constants.Signature, Filename, Sub(x, y) RaiseEvent ProgressionWrite(x, y), Level)) Then
+        If (Me.Entrypoint IsNot Nothing AndAlso Not New Header.Writer().Build(Me.Entrypoint, Constants.Signature, Filename, AddressOf Me.Compression)) Then
             Throw New Exception(String.Format("Unable to create header for '{0}'", New IO.FileInfo(Filename).Name))
         End If
     End Sub
@@ -70,19 +64,34 @@ Public Class Provider
                                                          End Sub)
         End Select
     End Sub
+    Private Sub Compression(n As Int64, t As Int64)
+        RaiseEvent ProgressionRead(n, t)
+        If (n = 0 AndAlso t = 0) Then
+            RaiseEvent Status("Ready")
+        Else
+            RaiseEvent Status(String.Format("Packing... {0}%", Math.Floor((n / t) * 100)))
+        End If
+    End Sub
+    Private Sub Decompression(n As Int64, t As Int64)
+        RaiseEvent ProgressionRead(n, t)
+        If (n = 0 AndAlso t = 0) Then
+            RaiseEvent Status("Ready")
+        Else
+            RaiseEvent Status(String.Format("Unpacking... {0}%", Math.Floor((n / t) * 100)))
+        End If
+    End Sub
     Private Sub ScanDirectory(directory As IO.DirectoryInfo, Parent As Entity)
         For Each x As IO.DirectoryInfo In directory.GetDirectories()
             Try
-                RaiseEvent Searching(x.FullName)
+                RaiseEvent Status(String.Format("Looking ... {0}", x.Name))
                 Me.ScanDirectory(x, Me.CreateEntity(x.Name, EntityType.Directory, Parent))
             Catch ex As UnauthorizedAccessException
-                'No access to folder, skip it
             End Try
         Next
         For Each y As IO.FileInfo In directory.GetFiles()
             Me.CreateEntity(y.FullName, EntityType.File, Parent)
         Next
-        RaiseEvent Searching("Ready")
+        RaiseEvent Status("Ready")
     End Sub
     Private Function CreateEntity(Name As String, Type As EntityType, Parent As Entity) As Entity
         Dim result As Entity = Nothing
@@ -112,8 +121,11 @@ Public Class Provider
         End If
         Return result
     End Function
-    Private Function IsReadme(Filename As String) As Boolean
-        Return New IO.FileInfo(Filename).Exists AndAlso New IO.FileInfo(Filename).Name.Equals("readme.md", StringComparison.OrdinalIgnoreCase)
-    End Function
-    Public Property Entrypoint As Entrypoint
+    Public Overrides Sub CatchException(ex As Exception)
+        If (IO.File.Exists(Constants.ErrorLog)) Then IO.File.Delete(Constants.ErrorLog)
+        Using bw As New IO.BinaryWriter(New IO.FileStream(Constants.ErrorLog, IO.FileMode.CreateNew, IO.FileAccess.Write, IO.FileShare.Write))
+            bw.Write(ex.ToString)
+            bw.Flush()
+        End Using
+    End Sub
 End Class

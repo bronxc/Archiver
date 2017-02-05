@@ -1,6 +1,5 @@
 ﻿Namespace Entities
-    <Serializable>
-    Public MustInherit Class Entity
+    <Serializable> Public MustInherit Class Entity
         Sub New(Name As String, Type As EntityType)
             Me.Name = Name
             Me.Type = Type
