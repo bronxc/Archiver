@@ -1,0 +1,11 @@
+ÛSystem.IO.IOException: File 'archive_test.arc' is locked by another process
+
+Server stack trace: 
+   at Archiver.Provider.Open(String filename) in C:\Users\Barret\Documents\GitHub\Archiver\Provider.vb:line 14
+
+Exception rethrown at [0]: 
+   at System.Runtime.Remoting.Proxies.RealProxy.HandleReturnMessage(IMessage reqMsg, IMessage retMsg)
+   at System.Runtime.Remoting.Proxies.RealProxy.PrivateInvoke(MessageData& msgData, Int32 type)
+   at Archiver.Provider.Open(String filename)
+   at Archiver.Explorer.FrmMain._Closure$__2._Lambda$__5() in C:\Users\Barret\Documents\GitHub\Archiver\Explorer\FrmMain.vb:line 45
+   at Archiver.Debugger.Run(Action Method) in C:\Users\Barret\Documents\GitHub\Archiver\Debugger.vb:line 13

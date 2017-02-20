@@ -1,0 +1,9 @@
+C:\Users\Barret\Documents\GitHub\Archiver\bin\Release\Archiver.dll
+C:\Users\Barret\Documents\GitHub\Archiver\bin\Release\Archiver.pdb
+C:\Users\Barret\Documents\GitHub\Archiver\bin\Release\Header.dll
+C:\Users\Barret\Documents\GitHub\Archiver\bin\Release\Header.pdb
+C:\Users\Barret\Documents\GitHub\Archiver\obj\Release\Archiver.vbprojResolveAssemblyReference.cache
+C:\Users\Barret\Documents\GitHub\Archiver\obj\Release\Archiver.Resources.resources
+C:\Users\Barret\Documents\GitHub\Archiver\obj\Release\Archiver.vbproj.GenerateResource.Cache
+C:\Users\Barret\Documents\GitHub\Archiver\obj\Release\Archiver.dll
+C:\Users\Barret\Documents\GitHub\Archiver\obj\Release\Archiver.pdb
